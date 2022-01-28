@@ -1,13 +1,118 @@
-body {
+:root {
+  --backdrop-color: rgba(0, 0, 0, 0.5);
+}
+
+/* * {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  padding: 0;
+  box-sizing: border-box;
+} */
+
+body {
+  padding: 1rem;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+h2,
+h3 {
+  margin-top: 0;
+}
+
+.flexbox {
+  display: flex;
+  justify-content: space-between;
+}
+
+.inline-subtext {
+  font-size: 80%;
+  opacity: .8;
+}
+
+.inline-padding {
+  margin-left: .4rem;
+}
+
+.homepage-container {
+  position: relative;
+}
+
+/* .card-image {
+  padding: 1rem;
+} */
+
+.events-container {
+  display: flex;
+  flex-direction: column;
+  width: 90vw;
+  margin: 1rem auto;
+  row-gap: 1rem;
+}
+
+.event-card {
+  padding: 1rem;
+
+  /* display: flex; */
+  /* justify-content: space-between; */
+  /* flex-direction: column; */
+}
+
+.event-modal {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  /* width: 90vw;
+  height: 90vh; */
+}
+/* 
+.location-contact-container {
+  display: flex;
+  justify-content: space-between;
+} */
+
+.card-section-title {
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.card-image {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-left: 2rem;
+}
+
+.card-image > img {
+  margin-bottom: 0.5rem;
+}
+
+.card-image button {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.backdrop {
+  background-color: var(--backdrop-color);
+  opacity: 0.9;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 99;
 }
