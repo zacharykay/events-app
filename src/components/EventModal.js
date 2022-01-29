@@ -48,27 +48,35 @@ const EventCard = (event) => {
         <div>
           <p>
             <span>{moment(currentDate).format("MMMM Do, YYYY")}</span>
-            {" @ "}
-            <span>{time}pm</span>
+
+            {time ? (
+              <span>
+                {" "}
+                {" @ "}
+                {time}pm
+              </span>
+            ) : null}
           </p>
         </div>
         <div>
           <p>{description}</p>
         </div>
         <div className="flexbox">
-          <div className="location-container">
-            <p className="card-section-title">Location:</p>
-            {typeof eventAddress === "object" ? (
-              <React.Fragment>
-                <p>{eventAddress[0]}</p>
-                <p>
-                  {eventAddress[1]}, {eventAddress[2]} {eventAddress[3]}
-                </p>
-              </React.Fragment>
-            ) : (
-              <p>{eventAddress}</p>
-            )}
-          </div>
+          {address ? (
+            <div className="location-container">
+              <p className="card-section-title">Location:</p>
+              {typeof eventAddress === "object" ? (
+                <React.Fragment>
+                  <p>{eventAddress[0]}</p>
+                  <p>
+                    {eventAddress[1]}, {eventAddress[2]} {eventAddress[3]}
+                  </p>
+                </React.Fragment>
+              ) : (
+                <p>{eventAddress}</p>
+              )}
+            </div>
+          ) : null}
           <div className="contact-container">
             <p className="card-section-title">Contact:</p>
             <p>
@@ -81,7 +89,7 @@ const EventCard = (event) => {
         </div>
       </div>
       <div className="card-image">
-        <img src={image} alt={`${company}'s ${name} Event`} />
+        {image ? <img src={image} alt={`${company}'s ${name} Event`} /> : null}
         <Link to={`/edit/${id}`}>
           <button>Edit Event</button>
         </Link>
