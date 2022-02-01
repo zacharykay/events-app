@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { useEventContext } from "../contexts/event_context";
 
@@ -12,9 +12,18 @@ const EventForm = ({
   description,
   color,
 }) => {
-  const { form_data, handleFormData, handleSubmit } = useEventContext();
+  const { form_data, setFormData, handleFormData, handleSubmit } = useEventContext();
 
   const httpMethod = editEvent ? "PUT" : "POST";
+
+  const initialFormData = {
+    name: name || "",
+    company: company || "",
+    email: email || "",
+    phone: phone || "",
+    description: description || "",
+    color: color || "none",
+  };
 
   const [ isTouched, setIsTouched ] = useState({
     name: false,
@@ -30,6 +39,13 @@ const EventForm = ({
     setIsTouched({ ...isTouched, [inputName]: true });
   };
 
+  useEffect(
+    () => {
+      setFormData(initialFormData);
+    },
+    [ color ]
+  );
+
   return (
     <section>
       <form className="event-form" onSubmit={(e) => e.preventDefault()}>
@@ -42,7 +58,7 @@ const EventForm = ({
             minLength={3}
             maxLength={50}
             placeholder={editEvent ? name : "Annual Convention"}
-            value={editEvent && !isTouched.name ? name || "" : form_data.name}
+            value={editEvent && !isTouched.name ? name || "" : form_data.name || ""}
             onInput={handleFormData}
             onFocus={(e) => touchHandler(e)}
             required
@@ -55,7 +71,9 @@ const EventForm = ({
             minLength={3}
             maxLength={50}
             placeholder={editEvent ? company : "Google"}
-            value={editEvent && !isTouched.company ? company || "" : form_data.company}
+            value={
+              editEvent && !isTouched.company ? company || "" : form_data.company || ""
+            }
             onInput={handleFormData}
             onFocus={(e) => touchHandler(e)}
             required
@@ -68,7 +86,7 @@ const EventForm = ({
             minLength={5}
             maxLength={100}
             placeholder={editEvent ? email : "johndoe@gmail.com"}
-            value={editEvent && !isTouched.email ? email || "" : form_data.email}
+            value={editEvent && !isTouched.email ? email || "" : form_data.email || ""}
             onInput={handleFormData}
             onFocus={(e) => touchHandler(e)}
             required
@@ -79,7 +97,7 @@ const EventForm = ({
             id="phone"
             type="tel"
             placeholder={editEvent ? phone : "(555) 555-5555"}
-            value={editEvent && !isTouched.phone ? phone || "" : form_data.phone}
+            value={editEvent && !isTouched.phone ? phone || "" : form_data.phone || ""}
             onInput={handleFormData}
             onFocus={(e) => touchHandler(e)}
             required
@@ -101,7 +119,7 @@ const EventForm = ({
               editEvent && !isTouched.description ? (
                 description || ""
               ) : (
-                form_data.description
+                form_data.description || ""
               )
             }
             onInput={handleFormData}
@@ -136,7 +154,10 @@ const EventForm = ({
             <option value="black">Black</option>
           </select>
         </div>
-        <button onClick={() => handleSubmit(httpMethod, eventId)}>Submit</button>
+        <button onClick={(e) => handleSubmit(e, httpMethod, eventId, form_data)}>
+          Submit
+        </button>
+        <div className="submit-message">Success</div>
       </form>
     </section>
   );

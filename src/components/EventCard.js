@@ -2,12 +2,12 @@ import React from "react";
 
 import { useEventContext } from "../contexts/event_context";
 
-const EventCard = ({ index, ...event }) => {
+const EventCard = ({ index, setShowModal, setCurrentModal, ...event }) => {
   const { name, company, description, id } = event;
 
   const { showModal, currentModal, openModal, handleDeletion } = useEventContext();
 
-  console.log("EVENT ID", id);
+  //   console.log("EVENT ID", id);
 
   return (
     <div className="event-card">
@@ -29,9 +29,8 @@ const EventCard = ({ index, ...event }) => {
       <div className="flexbox">
         <button
           onClick={() => {
-            console.log("1", index, currentModal);
-            openModal(index);
-            console.log("2", index, currentModal);
+            setCurrentModal(index);
+            setShowModal(true);
           }}
         >
           View Event

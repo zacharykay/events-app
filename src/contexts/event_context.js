@@ -7,6 +7,7 @@ import {
   SORT_DATA,
   OPEN_MODAL,
   CLOSE_MODAL,
+  SET_FORM_DATA,
   UPDATE_FORM,
   CLEAR_FORM,
   ADD_EVENT,
@@ -27,23 +28,22 @@ const requestOptions = (method, data) => {
   };
 };
 
-// Initial Form State
-const defaultFormData = {
+const initialState = {
+  events_data: [],
+  sorted_data: [],
+  form_data: [],
+  showModal: false,
+  currentModal: null,
+  data_sort: true,
+};
+
+const blankFormData = {
   name: "",
   company: "",
   email: "",
   phone: "",
   description: "",
   color: "none",
-};
-
-const initialState = {
-  events_data: [],
-  sorted_data: [],
-  form_data: defaultFormData,
-  showModal: false,
-  currentModal: null,
-  data_sort: true,
 };
 
 export const EventContext = createContext();
@@ -62,17 +62,22 @@ export const EventProvider = ({ children }) => {
     }
   }, []);
 
-  const changeCurrentModal = (index) => {
-    dispatch({ type: OPEN_MODAL, payload: index });
-  };
+  // const changeCurrentModal = (index) => {
+  //   dispatch({ type: OPEN_MODAL, payload: index });
+  // };
 
-  const openModal = (index) => {
-    dispatch({ type: OPEN_MODAL, payload: index });
-  };
+  // const openModal = (index) => {
+  //   dispatch({ type: OPEN_MODAL, payload: index });
+  // };
 
-  const closeModal = (index) => {
-    dispatch({ type: CLOSE_MODAL });
-  };
+  // const closeModal = (index) => {
+  //   dispatch({ type: CLOSE_MODAL });
+  // };
+
+  const setFormData = useCallback((initialFormData) => {
+    console.log("INITIAL", initialFormData);
+    dispatch({ type: SET_FORM_DATA, payload: initialFormData });
+  }, []);
 
   const handleFormData = (e) => {
     let formName = e.target.name;
@@ -81,82 +86,60 @@ export const EventProvider = ({ children }) => {
   };
 
   const clearFormData = () => {
-    dispatch({ type: CLEAR_FORM, payload: { defaultFormData } });
+    dispatch({ type: CLEAR_FORM, payload: blankFormData });
   };
 
   // Handles both Put and Post Requests
-  const handleSubmit = async (httpMethod, eventId) => {
-    // e.preventDefault();
+  const handleSubmit = async (e, httpMethod, eventId) => {
+    e.preventDefault();
 
     try {
       if (state.form_data.color !== "none") {
-        console.log("state.form_data", state.form_data);
-        // const sanitizedData = state.form_data.map((datum) => {
-        //   console.log("DATUM", datum, datum.trim());
-        //   return datum.trim();
-        // });
         if (httpMethod === "PUT") {
           const response = await fetch(
-            `${apiUrl}${eventId}`,
+            `${apiUrl}/${eventId}`,
             requestOptions("PUT", state.form_data)
           );
           const data = await response.json();
 
-          // const editedEvent = events_data.filter((event) => event.id === eventId);
-
-          // const keys = Object.keys(data);
-
-          let updatedEvents;
-
-          dispatch({ type: EDIT_EVENT, payload: updatedEvents });
+          if (response.ok) {
+            dispatch({ type: EDIT_EVENT, payload: { data, eventId } });
+          }
 
           if (!response.ok) {
             throw new Error(response.status);
           }
-
-          if (httpMethod === "POST") {
-            const response = await fetch(apiUrl, requestOptions("POST", state.form_data));
-            const data = await response.json();
-
-            const updatedEvents = state.events_data.push(data);
-
-            dispatch({ type: ADD_EVENT, payload: updatedEvents });
-
-            if (!response.ok) {
-              throw new Error(response.status);
-            }
-          }
-        } else {
-          throw new Error("No color scheme selected");
         }
+
+        if (httpMethod === "POST") {
+          const response = await fetch(apiUrl, requestOptions("POST", state.form_data));
+          const data = await response.json();
+
+          if (response.ok) {
+            dispatch({ type: ADD_EVENT, payload: data });
+          }
+
+          if (!response.ok) {
+            throw new Error(response.status);
+          }
+        }
+      } else {
+        throw new Error("No color scheme selected");
       }
 
-      clearFormData();
+      // clearFormData();
     } catch (err) {
-      throw new Error("Data not in proper formats", err.msg);
+      throw new Error("Data not in proper formats", err);
     }
   };
 
   const handleDeletion = async (id) => {
     try {
-      fetch(`${apiUrl}${id}`, { method: "DELETE" });
+      const eventId = id;
+      const response = await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
 
-      // Maintain Sorted Data
-      let filteredData;
-      if (state.sorted_data.length > 1) {
-        filteredData = state.sorted_data;
-      }
-
-      filteredData = state.events_data.filter((event) => {
-        return event.id !== id;
-      });
-
-      console.log("FILTERED_DATA", filteredData);
-
-      if (state.sorted_data.length > 1) {
-        dispatch({ type: DELETE_SORTED_EVENT, payload: filteredData });
-      } else if (state.sorted_data.length <= 1) {
-        dispatch({ type: DELETE_EVENT, payload: filteredData });
+      if (response.ok) {
+        dispatch({ type: DELETE_EVENT, payload: eventId });
       }
     } catch (err) {
       throw new Error("Deletion Failed");
@@ -179,21 +162,15 @@ export const EventProvider = ({ children }) => {
     fetchData();
   }, []);
 
-  // useEffect(
-  //   () => {
-  //     initialState.showModal = !initialState.showModal;
-  //   },
-  //   [ initialState.currentModal ]
-  // );
-
   return (
     <EventContext.Provider
       value={{
         ...state,
         fetchData,
-        changeCurrentModal,
-        openModal,
-        closeModal,
+        // changeCurrentModal,
+        // openModal,
+        // closeModal,
+        setFormData,
         handleFormData,
         clearFormData,
         handleSubmit,

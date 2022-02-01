@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import { useEventContext } from "../contexts/event_context";
 
-const EventCard = (event) => {
+const EventCard = ({ setShowModal, setCurrentModal, ...event }) => {
   const {
     id,
     color,
@@ -93,7 +93,14 @@ const EventCard = (event) => {
         <Link to={`/edit/${id}`}>
           <button>Edit Event</button>
         </Link>
-        <button onClick={() => closeModal()}>Hide Event</button>
+        <button
+          onClick={() => {
+            setShowModal(false);
+            setCurrentModal(null);
+          }}
+        >
+          Hide Event
+        </button>
       </div>
     </div>
   );

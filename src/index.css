@@ -65,13 +65,13 @@ h3 {
 }
 
 .event-modal {
-  margin: 0;
+  margin: 1rem;
   padding: 0;
   background: #fff;
   padding: 1rem;
   border-radius: 10px;
   z-index: 100;
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   left: 0;
@@ -135,4 +135,9 @@ h3 {
 .form-control > textarea,
 .form-control > select {
   margin-bottom: .5rem;
+}
+
+.submit-message {
+  margin: 1rem auto;
+  max-width: 480px;
 }

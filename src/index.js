@@ -6,8 +6,10 @@ import App from "./App";
 import { EventProvider } from "./contexts/event_context";
 
 ReactDOM.render(
-  <EventProvider>
-    <App />
-  </EventProvider>,
+  <React.StrictMode>
+    <EventProvider>
+      <App />
+    </EventProvider>
+  </React.StrictMode>,
   document.getElementById("root")
 );
