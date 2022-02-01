@@ -1,26 +1,23 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { useEventContext } from "../contexts/event_context";
 
-const EventForm = ({
-  editEvent,
-  eventId,
-  name,
-  company,
-  phone,
-  email,
-  description,
-  color,
-}) => {
-  const { form_data, setFormData, handleFormData, handleSubmit } = useEventContext();
+const EventForm = ({ editEvent, eventId, name, company, description, color }) => {
+  const {
+    form_data,
+    setFormData,
+    handleFormData,
+    handleSubmit,
+    formSuccess,
+    error,
+  } = useEventContext();
 
   const httpMethod = editEvent ? "PUT" : "POST";
 
   const initialFormData = {
     name: name || "",
     company: company || "",
-    email: email || "",
-    phone: phone || "",
     description: description || "",
     color: color || "none",
   };
@@ -28,8 +25,6 @@ const EventForm = ({
   const [ isTouched, setIsTouched ] = useState({
     name: false,
     company: false,
-    email: false,
-    phone: false,
     description: false,
     color: false,
   });
@@ -44,6 +39,17 @@ const EventForm = ({
       setFormData(initialFormData);
     },
     [ color ]
+  );
+
+  let navigate = useNavigate();
+
+  useEffect(
+    () => {
+      if (formSuccess) {
+        navigate("/");
+      }
+    },
+    [ formSuccess ]
   );
 
   return (
@@ -77,31 +83,6 @@ const EventForm = ({
             onInput={handleFormData}
             onFocus={(e) => touchHandler(e)}
             required
-          />
-          <label htmlFor="email">Contact Email</label>
-          <input
-            name="email"
-            id="email"
-            type="email"
-            minLength={5}
-            maxLength={100}
-            placeholder={editEvent ? email : "johndoe@gmail.com"}
-            value={editEvent && !isTouched.email ? email || "" : form_data.email || ""}
-            onInput={handleFormData}
-            onFocus={(e) => touchHandler(e)}
-            required
-          />
-          <label htmlFor="phone">Contact Phone</label>
-          <input
-            name="phone"
-            id="phone"
-            type="tel"
-            placeholder={editEvent ? phone : "(555) 555-5555"}
-            value={editEvent && !isTouched.phone ? phone || "" : form_data.phone || ""}
-            onInput={handleFormData}
-            onFocus={(e) => touchHandler(e)}
-            required
-            validate="true"
           />
           <label htmlFor="description">Event Description</label>
           <textarea
@@ -157,7 +138,14 @@ const EventForm = ({
         <button onClick={(e) => handleSubmit(e, httpMethod, eventId, form_data)}>
           Submit
         </button>
-        <div className="submit-message">Success</div>
+        {error.formError ? (
+          <React.Fragment>
+            <div className="error-message">{`Failed to ${editEvent
+              ? "edit event details"
+              : "add new event"}. Please fill out all fields correctly`}</div>
+            <div className="error-message">{error.formError.error_message}</div>
+          </React.Fragment>
+        ) : null}
       </form>
     </section>
   );

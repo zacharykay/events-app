@@ -1,13 +1,10 @@
 import React from "react";
-
 import { useEventContext } from "../contexts/event_context";
 
 const EventCard = ({ index, setShowModal, setCurrentModal, ...event }) => {
   const { name, company, description, id } = event;
 
-  const { showModal, currentModal, openModal, handleDeletion } = useEventContext();
-
-  //   console.log("EVENT ID", id);
+  const { handleDeletion, error } = useEventContext();
 
   return (
     <div className="event-card">
@@ -37,6 +34,12 @@ const EventCard = ({ index, setShowModal, setCurrentModal, ...event }) => {
         </button>
         <button onClick={() => handleDeletion(id)}>Delete Event</button>
       </div>
+
+      {error.deletionError && error.deletionError.deletionId === id ? (
+        <React.Fragment>
+          <div className="error-message">{error.deletionError.error_message}</div>
+        </React.Fragment>
+      ) : null}
     </div>
   );
 };

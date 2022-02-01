@@ -1,12 +1,9 @@
-// export const LOAD_EVENTS = 'LOAD_EVENTS'
 export const FETCH_DATA_SUCCESS = "FETCH_DATA_SUCCESS";
 export const SORT_DATA = "SORT_DATA";
-export const OPEN_MODAL = "OPEN_MODAL";
-export const CLOSE_MODAL = "CLOSE_MODAL";
+
 export const SET_FORM_DATA = "SET_FORM_DATA";
 export const UPDATE_FORM = "UPDATE_FORM";
-export const CLEAR_FORM = "CLEAR_FORM";
+
 export const ADD_EVENT = "ADD_EVENT";
 export const EDIT_EVENT = "EDIT_EVENT";
 export const DELETE_EVENT = "DELETE_EVENT";
-export const DELETE_SORTED_EVENT = "DELETE_SORTED_EVENT";

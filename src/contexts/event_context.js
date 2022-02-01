@@ -1,24 +1,26 @@
-import { useEffect, useContext, useReducer, useCallback, createContext } from "react";
+import {
+  useState,
+  useEffect,
+  useContext,
+  useReducer,
+  useCallback,
+  createContext,
+} from "react";
 
 import reducer from "../reducers/event_reducer";
 
 import {
   FETCH_DATA_SUCCESS,
   SORT_DATA,
-  OPEN_MODAL,
-  CLOSE_MODAL,
   SET_FORM_DATA,
   UPDATE_FORM,
-  CLEAR_FORM,
   ADD_EVENT,
   EDIT_EVENT,
   DELETE_EVENT,
-  DELETE_SORTED_EVENT,
 } from "../util/actions";
 
 // CORS & API URL
 const apiUrl = process.env.REACT_APP_API_URL;
-console.log("API URL", apiUrl);
 const fetchHeaders = { "Content-Type": "application/json" };
 const requestOptions = (method, data) => {
   return {
@@ -28,6 +30,7 @@ const requestOptions = (method, data) => {
   };
 };
 
+// initial State / Store
 const initialState = {
   events_data: [],
   sorted_data: [],
@@ -37,64 +40,82 @@ const initialState = {
   data_sort: true,
 };
 
-const blankFormData = {
-  name: "",
-  company: "",
-  email: "",
-  phone: "",
-  description: "",
-  color: "none",
-};
-
 export const EventContext = createContext();
 
 export const EventProvider = ({ children }) => {
   const [ state, dispatch ] = useReducer(reducer, initialState);
 
+  // Successful Form Submission for PUT / POST
+  const [ formSuccess, setFormSuccess ] = useState(false);
+
+  // Error Handling
+  const initialErrorState = {
+    fetchError: false,
+    formError: false,
+    deletionError: false,
+  };
+  const [ error, setError ] = useState(initialErrorState);
+  // Form Error Messages
+  const formErrorMessage = (dataType, charLength) =>
+    `Please include a ${dataType} that is at least ${charLength.toString()} characters long.`;
+  // Server Error Message
+  const serverErrorMessage = (status, message) =>
+    `Sorry, a server error (Error ${status}) occurred and ${message}. Please try again later.`;
+  // Unknown Error
+  const unknownErrorMessage = (message) =>
+    `Sorry, an unknown error has occurred and ${message} Please try again later.`;
+
+  // Fetch / Read Data from Server
   const fetchData = useCallback(async () => {
+    setError(initialErrorState);
     try {
       const response = await fetch(apiUrl, { method: "GET", headers: fetchHeaders });
       const data = await response.json();
 
-      dispatch({ type: FETCH_DATA_SUCCESS, payload: data });
+      if (response.ok) {
+        dispatch({ type: FETCH_DATA_SUCCESS, payload: data });
+      }
+      if (!response.ok) {
+        setError({
+          fetchError: {
+            error_message: serverErrorMessage(response.status, "Unable to load events"),
+          },
+        });
+      }
     } catch (err) {
-      console.log("Could not fetch events", err);
+      setError({
+        fetchError: { error_message: unknownErrorMessage("Events were unable to load") },
+      });
     }
   }, []);
 
-  // const changeCurrentModal = (index) => {
-  //   dispatch({ type: OPEN_MODAL, payload: index });
-  // };
-
-  // const openModal = (index) => {
-  //   dispatch({ type: OPEN_MODAL, payload: index });
-  // };
-
-  // const closeModal = (index) => {
-  //   dispatch({ type: CLOSE_MODAL });
-  // };
-
+  // Set form data on load to existing data when editing
   const setFormData = useCallback((initialFormData) => {
-    console.log("INITIAL", initialFormData);
     dispatch({ type: SET_FORM_DATA, payload: initialFormData });
   }, []);
 
+  // Dynamically change Form Data / Controlled inputs
   const handleFormData = (e) => {
     let formName = e.target.name;
     let formValue = e.target.value;
     dispatch({ type: UPDATE_FORM, payload: { formName, formValue } });
   };
 
-  const clearFormData = () => {
-    dispatch({ type: CLEAR_FORM, payload: blankFormData });
-  };
-
+  //
+  //
   // Handles both Put and Post Requests
   const handleSubmit = async (e, httpMethod, eventId) => {
     e.preventDefault();
+    setError(initialErrorState);
 
     try {
-      if (state.form_data.color !== "none") {
+      if (
+        state.form_data.color !== "none" &&
+        state.form_data.name.length > 2 &&
+        state.form_data.company.length > 2 &&
+        state.form_data.description.length > 3
+      ) {
+        // Edit Event Form
         if (httpMethod === "PUT") {
           const response = await fetch(
             `${apiUrl}/${eventId}`,
@@ -102,38 +123,74 @@ export const EventProvider = ({ children }) => {
           );
           const data = await response.json();
 
-          if (response.ok) {
+          if (data.name && response.ok) {
             dispatch({ type: EDIT_EVENT, payload: { data, eventId } });
+            setFormSuccess(true);
+            setFormSuccess(false);
           }
 
           if (!response.ok) {
-            throw new Error(response.status);
+            setError({
+              formError: {
+                error_message: serverErrorMessage(
+                  response.status,
+                  "Event was not edited"
+                ),
+              },
+            });
           }
         }
 
+        // Add Event Form
         if (httpMethod === "POST") {
           const response = await fetch(apiUrl, requestOptions("POST", state.form_data));
           const data = await response.json();
 
           if (response.ok) {
             dispatch({ type: ADD_EVENT, payload: data });
+            setFormSuccess(true);
+            setFormSuccess(false);
           }
 
           if (!response.ok) {
-            throw new Error(response.status);
+            setError({
+              formError: {
+                error_message: serverErrorMessage(
+                  response.status,
+                  "Event was not created"
+                ),
+              },
+            });
           }
         }
-      } else {
-        throw new Error("No color scheme selected");
       }
-
-      // clearFormData();
+      // Catch + Display Errors if Form Data in wrong format
+      if (state.form_data.name.length < 3) {
+        setError({ formError: { error_message: formErrorMessage("Event Name", 3) } });
+      }
+      if (state.form_data.company.length < 3) {
+        setError({ formError: { error_message: formErrorMessage("Company Name", 3) } });
+      }
+      if (state.form_data.description.length < 4) {
+        setError({ formError: { error_message: formErrorMessage("Description", 4) } });
+      }
+      if (state.form_data.color === "none") {
+        setError({
+          formError: { error_message: "No color was selected, but is required" },
+        });
+      }
     } catch (err) {
-      throw new Error("Data not in proper formats", err);
+      setError({
+        formError: {
+          error_message: "Sorry, an unknown error has occurred, please try again later.",
+        },
+      });
     }
   };
 
+  // Delete Event
   const handleDeletion = async (id) => {
+    setError(initialErrorState);
     try {
       const eventId = id;
       const response = await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
@@ -141,11 +198,26 @@ export const EventProvider = ({ children }) => {
       if (response.ok) {
         dispatch({ type: DELETE_EVENT, payload: eventId });
       }
+
+      if (!response.ok) {
+        setError({
+          deletionError: {
+            error_message: serverErrorMessage(response.status, "Event was not deleted"),
+            deletionId: id,
+          },
+        });
+      }
     } catch (err) {
-      throw new Error("Deletion Failed");
+      setError({
+        deletionError: {
+          error_message: unknownErrorMessage("Event was not deleted"),
+          deletionId: id,
+        },
+      });
     }
   };
 
+  // Sort Data Alphabetically / Reverse Alphabetically
   const sortData = () => {
     let sortedData = state.events_data.sort((a, b) => {
       return a.company.localeCompare(b.company, "en", { sensitivity: "base" });
@@ -167,15 +239,13 @@ export const EventProvider = ({ children }) => {
       value={{
         ...state,
         fetchData,
-        // changeCurrentModal,
-        // openModal,
-        // closeModal,
         setFormData,
         handleFormData,
-        clearFormData,
         handleSubmit,
         sortData,
         handleDeletion,
+        formSuccess,
+        error,
       }}
     >
       {children}

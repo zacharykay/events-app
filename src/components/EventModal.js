@@ -2,13 +2,10 @@ import React from "react";
 import moment from "moment";
 import { Link } from "react-router-dom";
 
-import { useEventContext } from "../contexts/event_context";
-
 const EventCard = ({ setShowModal, setCurrentModal, ...event }) => {
   const {
     id,
     color,
-    isActive,
     name,
     date,
     time,
@@ -18,10 +15,7 @@ const EventCard = ({ setShowModal, setCurrentModal, ...event }) => {
     address,
     description,
     image,
-    createdOn,
   } = event;
-
-  const { closeModal } = useEventContext();
 
   const currentDate = moment().format(date, "YYYY-MM-DD");
   const eventAddress =
@@ -80,10 +74,10 @@ const EventCard = ({ setShowModal, setCurrentModal, ...event }) => {
           <div className="contact-container">
             <p className="card-section-title">Contact:</p>
             <p>
-              <b>Email:</b> {email}
+              <b>Email:</b> {email ? email : "N/A"}
             </p>
             <p>
-              <b>Phone:</b> {phone}
+              <b>Phone:</b> {phone ? phone : "N/A"}
             </p>
           </div>
         </div>
