@@ -87,6 +87,7 @@ export const EventProvider = ({ children }) => {
         fetchError: { error_message: unknownErrorMessage("Events were unable to load") },
       });
     }
+    //eslint-disable-next-line
   }, []);
 
   // Set form data on load to existing data when editing
@@ -232,6 +233,7 @@ export const EventProvider = ({ children }) => {
 
   useEffect(() => {
     fetchData();
+    //eslint-disable-next-line
   }, []);
 
   return (

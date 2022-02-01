@@ -38,6 +38,7 @@ const EventForm = ({ editEvent, eventId, name, company, description, color }) =>
     () => {
       setFormData(initialFormData);
     },
+    //eslint-disable-next-line
     [ color ]
   );
 
@@ -49,6 +50,7 @@ const EventForm = ({ editEvent, eventId, name, company, description, color }) =>
         navigate("/");
       }
     },
+    //eslint-disable-next-line
     [ formSuccess ]
   );
 
@@ -143,7 +145,9 @@ const EventForm = ({ editEvent, eventId, name, company, description, color }) =>
             <div className="error-message">{`Failed to ${editEvent
               ? "edit event details"
               : "add new event"}. Please fill out all fields correctly`}</div>
-            <div className="error-message">{error.formError.error_message}</div>
+            <div className="error-message">
+              <b>{error.formError.error_message}</b>
+            </div>
           </React.Fragment>
         ) : null}
       </form>
