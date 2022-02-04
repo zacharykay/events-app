@@ -41,7 +41,7 @@ const Home = () => {
         {events_data.map((event, index) => {
           return (
             <EventCard
-              key={index}
+              key={event.id}
               index={index}
               setShowModal={setShowModal}
               setCurrentModal={setCurrentModal}
