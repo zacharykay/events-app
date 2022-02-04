@@ -7,3 +7,6 @@ export const UPDATE_FORM = "UPDATE_FORM";
 export const ADD_EVENT = "ADD_EVENT";
 export const EDIT_EVENT = "EDIT_EVENT";
 export const DELETE_EVENT = "DELETE_EVENT";
+
+export const DELETE_MULTIPLE = "DELETE_MULTIPLE";
+export const HANDLE_SELECTION = "HANDLE_SELECTION";

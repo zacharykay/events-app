@@ -4,10 +4,25 @@ import { useEventContext } from "../contexts/event_context";
 const EventCard = ({ index, setShowModal, setCurrentModal, ...event }) => {
   const { name, company, description, id } = event;
 
-  const { handleDeletion, error } = useEventContext();
+  const { handleDeletion, error, handleSelection, selection_data } = useEventContext();
 
   return (
     <div className="event-card">
+      <div className="checkbox-container">
+        <input
+          type="checkbox"
+          name="deletion"
+          id="deletion"
+          checked={
+            selection_data.find((selection) => {
+              return selection.id === event.id;
+            }) || false
+          }
+          onChange={(e) => {
+            handleSelection(e, event, index);
+          }}
+        />
+      </div>
       <div className="title-date-flexbox">
         <div>
           <h2>{name}</h2>

@@ -9,7 +9,14 @@ import { useEventContext } from "../contexts/event_context";
 import { FaLongArrowAltUp, FaLongArrowAltDown } from "react-icons/fa";
 
 const Home = () => {
-  const { events_data, sortData, data_sort, sorted_data, error } = useEventContext();
+  const {
+    events_data,
+    sortData,
+    data_sort,
+    sorted_data,
+    error,
+    deleteSelection,
+  } = useEventContext();
 
   const [ currentModal, setCurrentModal ] = useState(null);
   const [ showModal, setShowModal ] = useState(false);
@@ -26,6 +33,9 @@ const Home = () => {
             <FaLongArrowAltDown />
           )}
         </b>
+      </button>
+      <button style={{ marginLeft: "1.25rem" }} onClick={() => deleteSelection()}>
+        <b>Delete Selected</b>
       </button>
       <section className="events-container">
         {events_data.map((event, index) => {

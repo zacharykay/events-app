@@ -17,6 +17,8 @@ import {
   ADD_EVENT,
   EDIT_EVENT,
   DELETE_EVENT,
+  DELETE_MULTIPLE,
+  HANDLE_SELECTION,
 } from "../util/actions";
 
 // CORS & API URL
@@ -38,6 +40,7 @@ const initialState = {
   showModal: false,
   currentModal: null,
   data_sort: true,
+  selection_data: [],
 };
 
 export const EventContext = createContext();
@@ -128,6 +131,7 @@ export const EventProvider = ({ children }) => {
             dispatch({ type: EDIT_EVENT, payload: { data, eventId } });
             setFormSuccess(true);
             setFormSuccess(false);
+            // setChangeSuccessful({ put: true });
           }
 
           if (!response.ok) {
@@ -218,6 +222,48 @@ export const EventProvider = ({ children }) => {
     }
   };
 
+  // Delete Multiple Events
+  const deleteSelection = async () => {
+    // try {
+    //   // Or "DELETE" request depending on sever configuration
+    //   const response = await fetch(
+    //     `${apiUrl}/delete`,
+    //     requestOptions("POST", state.selection_data)
+    //   );
+
+    //   if (response.ok) {
+    dispatch({ type: DELETE_MULTIPLE });
+    //   }
+    //   if (!response.ok) {
+    //     setError({
+    //       deletionError: {
+    //         error_message: serverErrorMessage(
+    //           response.status,
+    //           "Multiple Events were not deleted"
+    //         ),
+    //       },
+    //     });
+    //   }
+    // } catch (err) {
+    //   setError({
+    //     deletionError: {
+    //       error_message: unknownErrorMessage("Multiple Events were not deleted"),
+    //     },
+    //   });
+    // }
+  };
+
+  // Delete Selection Handler
+  const handleSelection = (e, event) => {
+    let array = state.selection_data;
+    if (e.target.checked) {
+      array.push(event);
+    } else {
+      array = state.selection_data.filter((data) => data.id !== event.id);
+    }
+    dispatch({ type: HANDLE_SELECTION, payload: array });
+  };
+
   // Sort Data Alphabetically / Reverse Alphabetically
   const sortData = () => {
     let sortedData = state.events_data.sort((a, b) => {
@@ -246,6 +292,8 @@ export const EventProvider = ({ children }) => {
         handleSubmit,
         sortData,
         handleDeletion,
+        handleSelection,
+        deleteSelection,
         formSuccess,
         error,
       }}

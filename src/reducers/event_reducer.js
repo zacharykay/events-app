@@ -6,6 +6,8 @@ import {
   ADD_EVENT,
   EDIT_EVENT,
   DELETE_EVENT,
+  DELETE_MULTIPLE,
+  HANDLE_SELECTION,
 } from "../util/actions";
 
 const event_reducer = (state, action) => {
@@ -13,7 +15,10 @@ const event_reducer = (state, action) => {
 
   switch (type) {
     case FETCH_DATA_SUCCESS: {
-      return { ...state, events_data: payload };
+      return {
+        ...state,
+        events_data: payload,
+      };
     }
 
     case SET_FORM_DATA: {
@@ -60,6 +65,28 @@ const event_reducer = (state, action) => {
         events_data: state.events_data.filter((event) => {
           return event.id !== payload;
         }),
+      };
+    }
+
+    case DELETE_MULTIPLE: {
+      const ids = state.selection_data.map((selection) => selection.id);
+      const filteredData = state.events_data.filter((event) => {
+        if (ids.indexOf(event.id) > -1) {
+          return;
+        } else {
+          return event;
+        }
+      });
+      return {
+        ...state,
+        events_data: filteredData,
+      };
+    }
+
+    case HANDLE_SELECTION: {
+      return {
+        ...state,
+        selection_data: payload,
       };
     }
 

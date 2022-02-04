@@ -85,6 +85,10 @@ h3 {
   width: 100%;
 }
 
+.checkbox-container {
+  margin-bottom: 0.5rem;
+}
+
 .backdrop {
   background-color: var(--backdrop-color);
   opacity: 0.9;
