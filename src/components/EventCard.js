@@ -19,7 +19,7 @@ const EventCard = ({ index, setShowModal, setCurrentModal, ...event }) => {
             }) || false
           }
           onChange={(e) => {
-            handleSelection(e, event, index);
+            handleSelection(e, event);
           }}
         />
       </div>
