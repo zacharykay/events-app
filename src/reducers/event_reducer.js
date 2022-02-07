@@ -6,8 +6,7 @@ import {
   ADD_EVENT,
   EDIT_EVENT,
   DELETE_EVENT,
-  DELETE_MULTIPLE,
-  HANDLE_SELECTION,
+  HANDLE_CHECKBOX,
 } from "../util/actions";
 
 const event_reducer = (state, action) => {
@@ -68,25 +67,10 @@ const event_reducer = (state, action) => {
       };
     }
 
-    case DELETE_MULTIPLE: {
-      const ids = state.selection_data.map((selection) => selection.id);
-      const filteredData = state.events_data.filter((event) => {
-        if (ids.indexOf(event.id) > -1) {
-          return;
-        } else {
-          return event;
-        }
-      });
+    case HANDLE_CHECKBOX: {
       return {
         ...state,
-        events_data: filteredData,
-      };
-    }
-
-    case HANDLE_SELECTION: {
-      return {
-        ...state,
-        selection_data: payload,
+        checkbox_ids: payload,
       };
     }
 

@@ -15,7 +15,7 @@ const Home = () => {
     data_sort,
     sorted_data,
     error,
-    deleteSelection,
+    deleteMultiple,
   } = useEventContext();
 
   const [ currentModal, setCurrentModal ] = useState(null);
@@ -34,9 +34,7 @@ const Home = () => {
           )}
         </b>
       </button>
-      <button style={{ marginLeft: "1.25rem" }} onClick={() => deleteSelection()}>
-        <b>Delete Selected</b>
-      </button>
+      <button onClick={() => deleteMultiple()}>Delete Selected</button>
       <section className="events-container">
         {events_data.map((event, index) => {
           return (

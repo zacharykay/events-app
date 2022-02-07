@@ -17,8 +17,7 @@ import {
   ADD_EVENT,
   EDIT_EVENT,
   DELETE_EVENT,
-  DELETE_MULTIPLE,
-  HANDLE_SELECTION,
+  HANDLE_CHECKBOX,
 } from "../util/actions";
 
 // CORS & API URL
@@ -40,7 +39,7 @@ const initialState = {
   showModal: false,
   currentModal: null,
   data_sort: true,
-  selection_data: [],
+  checkbox_ids: [],
 };
 
 export const EventContext = createContext();
@@ -223,45 +222,27 @@ export const EventProvider = ({ children }) => {
   };
 
   // Delete Multiple Events
-  const deleteSelection = async () => {
-    // try {
-    //   // Or "DELETE" request depending on sever configuration
-    //   const response = await fetch(
-    //     `${apiUrl}/delete`,
-    //     requestOptions("POST", state.selection_data)
-    //   );
+  const deleteMultiple = async () => {
+    state.checkbox_ids.forEach(async (id) => {
+      const response = await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
 
-    //   if (response.ok) {
-    dispatch({ type: DELETE_MULTIPLE });
-    //   }
-    //   if (!response.ok) {
-    //     setError({
-    //       deletionError: {
-    //         error_message: serverErrorMessage(
-    //           response.status,
-    //           "Multiple Events were not deleted"
-    //         ),
-    //       },
-    //     });
-    //   }
-    // } catch (err) {
-    //   setError({
-    //     deletionError: {
-    //       error_message: unknownErrorMessage("Multiple Events were not deleted"),
-    //     },
-    //   });
-    // }
+      if (response.ok) {
+        dispatch({ type: DELETE_EVENT, payload: id });
+      }
+    });
   };
 
   // Delete Selection Handler
-  const handleSelection = (e, event) => {
-    let array = state.selection_data;
+  const changeHandler = (e, id) => {
+    let tempArray = [ ...state.checkbox_ids ];
+
     if (e.target.checked) {
-      array.push(event);
+      tempArray.push(id);
     } else {
-      array = state.selection_data.filter((data) => data.id !== event.id);
+      tempArray = state.checkbox_ids.filter((item) => item !== id);
     }
-    dispatch({ type: HANDLE_SELECTION, payload: array });
+
+    dispatch({ type: HANDLE_CHECKBOX, payload: tempArray });
   };
 
   // Sort Data Alphabetically / Reverse Alphabetically
@@ -292,8 +273,8 @@ export const EventProvider = ({ children }) => {
         handleSubmit,
         sortData,
         handleDeletion,
-        handleSelection,
-        deleteSelection,
+        deleteMultiple,
+        changeHandler,
         formSuccess,
         error,
       }}
